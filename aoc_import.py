@@ -20,14 +20,14 @@ def get_data(year=2024, day=1, output_dir=None):
     input_url = f"https://adventofcode.com/{year}/day/{day}/input"
     problem_url = f"https://adventofcode.com/{year}/day/{day}"
     input_txt = download_input(input_url, output_dir)
-    examples = extract_examples(problem_url, output_dir)
+    example1_txt, example2_txt = extract_examples(problem_url, output_dir)
 
-    return input_txt, examples
+    return input_txt, example1_txt, example2_txt
 
 def download_input(input_url, output_dir):
     input_path = os.path.join(output_dir, "input.txt")
     if os.path.exists(input_path):
-        print("input.txt already exists. Skipping download.")
+        print("input.txt already exists. Loading from file.")
         with open(input_path, "r") as f:
             return f.read().strip()
     response = requests.get(input_url, headers=headers)
@@ -38,23 +38,29 @@ def download_input(input_url, output_dir):
         return response.text.strip()
     else:
         print(f"Failed to download input.txt. Status code: {response.status_code}")
+        return None
 
 def extract_examples(problem_url, output_dir):
     example1_path = os.path.join(output_dir, "example1.txt")
     example2_path = os.path.join(output_dir, "example2.txt")
-    examples = []
+    example1_txt = None
+    example2_txt = None
+
+    # Check if example1.txt exists
     if os.path.exists(example1_path):
-        print("example1.txt already exists. Skipping extraction.")
+        print("example1.txt already exists. Loading from file.")
         with open(example1_path, "r") as f:
-            examples.append(f.read().strip())
+            example1_txt = f.read().strip()
+    # Check if example2.txt exists
     if os.path.exists(example2_path):
-        print("example2.txt already exists. Skipping extraction.")
+        print("example2.txt already exists. Loading from file.")
         with open(example2_path, "r") as f:
-            examples.append(f.read().strip())
+            example2_txt = f.read().strip()
+    # If both examples exist, return them
+    if example1_txt is not None and example2_txt is not None:
+        return example1_txt, example2_txt
 
-    if len(examples) == 2:
-        return examples
-
+    # Else, proceed to parse the problem page
     response = requests.get(problem_url, headers=headers)
     if response.status_code == 200:
         class ExampleHTMLParser(HTMLParser):
@@ -87,22 +93,22 @@ def extract_examples(problem_url, output_dir):
         parser.feed(response.text)
 
         if parser.examples:
-            if len(examples) == 0 and len(parser.examples) >= 1:
+            if example1_txt is None and len(parser.examples) >= 1:
+                example1_txt = parser.examples[0]
                 with open(example1_path, "w") as f:
-                    f.write(parser.examples[0])
-                examples.append(parser.examples[0])
+                    f.write(example1_txt)
                 print("example1.txt downloaded successfully.")
-            if len(parser.examples) >= 2:
+            if example2_txt is None and len(parser.examples) >= 2:
+                example2_txt = parser.examples[1]
                 with open(example2_path, "w") as f:
-                    f.write(parser.examples[1])
-                examples.append(parser.examples[1])
+                    f.write(example2_txt)
                 print("example2.txt downloaded successfully.")
-            else:
-                print("No example input for Part Two found.")
-            return examples
+            if example1_txt is None:
+                print("No example input found.")
+            return example1_txt, example2_txt
         else:
             print("No example inputs found.")
-            return examples
+            return example1_txt, example2_txt
     else:
         print(f"Failed to retrieve problem page. Status code: {response.status_code}")
-        return examples
+        return example1_txt, example2_txt
