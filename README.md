@@ -1,4 +1,4 @@
-# Retrieve the input and example data for Advent of Code 2024, Day 1
+# Example
 
 ``` python
 from aoc_import import get_data
