@@ -1,7 +1,7 @@
 import os
 import requests
-from bs4 import BeautifulSoup
 import inspect
+from html.parser import HTMLParser
 
 SESSION_COOKIE = os.environ.get("AOC_SESSION_COOKIE")
 
@@ -12,11 +12,9 @@ headers = {
 
 def get_data(year=2024, day=1, output_dir=None):
     if output_dir is None:
-
         frame = inspect.currentframe()
         caller_frame = inspect.getouterframes(frame)[1]
         caller_file = caller_frame.filename
-
         output_dir = os.path.dirname(os.path.abspath(caller_file))
 
     input_url = f"https://adventofcode.com/{year}/day/{day}/input"
@@ -49,19 +47,34 @@ def extract_example(problem_url, output_dir):
             return f.read().strip()
     response = requests.get(problem_url, headers=headers)
     if response.status_code == 200:
-        soup = BeautifulSoup(response.text, "html.parser")
-        examples = soup.find_all("pre")
-        if examples:
+        class ExampleHTMLParser(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.in_pre = False
+                self.example_text = ''
+                self.found = False
+
+            def handle_starttag(self, tag, attrs):
+                if tag == 'pre' and not self.found:
+                    self.in_pre = True
+
+            def handle_endtag(self, tag):
+                if tag == 'pre' and self.in_pre:
+                    self.in_pre = False
+                    self.found = True  # Only capture the first <pre> block
+
+            def handle_data(self, data):
+                if self.in_pre:
+                    self.example_text += data
+
+        parser = ExampleHTMLParser()
+        parser.feed(response.text)
+        if parser.example_text:
             with open(example_path, "w") as f:
-                f.write(examples[0].text.strip())
+                f.write(parser.example_text.strip())
             print("Example input extracted successfully.")
-            return examples[0].text.strip()
+            return parser.example_text.strip()
         else:
             print("No example input found.")
     else:
         print(f"Failed to retrieve problem page. Status code: {response.status_code}")
-
-
-
-
-
