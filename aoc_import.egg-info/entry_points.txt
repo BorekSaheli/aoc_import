@@ -1,0 +1,2 @@
+[console_scripts]
+aoc-import = aoc_import:main

@@ -1,0 +1,8 @@
+aoc_import.py
+setup.py
+aoc_import.egg-info/PKG-INFO
+aoc_import.egg-info/SOURCES.txt
+aoc_import.egg-info/dependency_links.txt
+aoc_import.egg-info/entry_points.txt
+aoc_import.egg-info/requires.txt
+aoc_import.egg-info/top_level.txt
