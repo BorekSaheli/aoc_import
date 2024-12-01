@@ -44,11 +44,11 @@ def extract_examples(problem_url, output_dir):
     example2_path = os.path.join(output_dir, "example2.txt")
     examples = []
     if os.path.exists(example1_path):
-        print("example.txt already exists. Skipping extraction.")
+        print("example1.txt already exists. Skipping extraction.")
         with open(example1_path, "r") as f:
             examples.append(f.read().strip())
     if os.path.exists(example2_path):
-        print("example_part_two.txt already exists. Skipping extraction.")
+        print("example2.txt already exists. Skipping extraction.")
         with open(example2_path, "r") as f:
             examples.append(f.read().strip())
 
@@ -91,12 +91,12 @@ def extract_examples(problem_url, output_dir):
                 with open(example1_path, "w") as f:
                     f.write(parser.examples[0])
                 examples.append(parser.examples[0])
-                print("Example input for Part One extracted successfully.")
+                print("example1.txt downloaded successfully.")
             if len(parser.examples) >= 2:
                 with open(example2_path, "w") as f:
                     f.write(parser.examples[1])
                 examples.append(parser.examples[1])
-                print("Example input for Part Two extracted successfully.")
+                print("example2.txt downloaded successfully.")
             else:
                 print("No example input for Part Two found.")
             return examples
