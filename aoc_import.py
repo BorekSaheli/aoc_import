@@ -91,12 +91,12 @@ def extract_examples(problem_url, output_dir):
                 with open(example1_path, "w") as f:
                     f.write(parser.examples[0])
                 examples.append(parser.examples[0])
-                print("example1.txt downloaded successfully.")
+                print("Example input for Part One extracted successfully.")
             if len(parser.examples) >= 2:
                 with open(example2_path, "w") as f:
                     f.write(parser.examples[1])
                 examples.append(parser.examples[1])
-                print("example2.txt downloaded successfully.")
+                print("Example input for Part Two extracted successfully.")
             else:
                 print("No example input for Part Two found.")
             return examples
